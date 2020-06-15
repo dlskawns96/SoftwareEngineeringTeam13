@@ -15,7 +15,7 @@
                     <div class="row">
                         <div class="col-md-9 col-lg-8 mx-auto">
                             <h3 class="login-heading mb-4">Welcome back!</h3>
-                            <form method="post" action="LoginCheck.php">
+                            <form method="post" action="http://localhost:8000/users">
                                 <div class="form-label-group">
                                     <input type="text" name="inputID" id="inputID" class="form-control" placeholder="Your Student ID" required autofocus>
                                     <label for="inputID">Student ID</label>
@@ -41,16 +41,9 @@
     </div>
 </div>
 <link rel="stylesheet" href="CSS_Login.css">
-<link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
-<script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
-<script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
-<script src='//unpkg.com/bootstrap@4/dist/js/bootstrap.min.js'></script>
-<script type="text/javascript">
-    $(function () {
-        $('#btn_login').click(function () {
-            alert($('#inputID').val())
-        })
-    })
-</script>
+<link rel="stylesheet" href="http://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
+<script src='http://unpkg.com/jquery@3/dist/jquery.min.js'></script>
+<script src='http://unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
+<script src='http://unpkg.com/bootstrap@4/dist/js/bootstrap.min.js'></script>
 </body>
 </html>
