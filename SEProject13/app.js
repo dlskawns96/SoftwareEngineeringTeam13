@@ -84,18 +84,18 @@ app.get('/', (req, res) => {
    res.redirect('/login');
 });
 
-//'http://localhost:8000' 로 접속하면 예약현황화면('HTMLPage.html')을 보여준다.
+//'http://localhost:8000' 로 접속하면 예약현황화면('Page_Reservation.html')을 보여준다.
 app.get( '/reservation', function(req, res, next){
    console.log('Server home call');
-   // fs.readFile('HTMLPage.html', function(error, data){
+   // fs.readFile('Page_Reservation.html', function(error, data){
    //    res.send(data.toString());
    // });
-    res.redirect('/HTMLPage.html');
+    res.redirect('/Page_Reservation.html');
 });
 
 app.get('/login', function (req, res, next) {
     if(req.session.logined){
-        res.redirect('/HTMLPage.html');
+        res.redirect('/Page_Reservation.html');
     } else {
         console.log('Login page call');
         console.log(__dirname);
@@ -164,7 +164,7 @@ app.post('/users', (req, res) => {
             console.log(rows[0].name);
             req.session.logined = true;
             req.session.user_id = rows[0].ID;
-            res.redirect('/HTMLPage.html')
+            res.redirect('/Page_Reservation.html')
         }
         // console.log('User info is: ', rows);
         // res.send(rows);
