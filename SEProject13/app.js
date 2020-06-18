@@ -106,8 +106,6 @@ app.get('/login', function (req, res, next) {
     // });
 })
 
-
-
 //'http://localhost:8000/seats' URL을 호출하면 그 순간의 좌석현황 정보를 전송한다.
 app.get('/seats', function(req, res, next){
    console.log('Server Seats Call');
@@ -115,14 +113,11 @@ app.get('/seats', function(req, res, next){
 });
 
 
-
 //웹서버 실행
 var server = http.createServer(app);
 server.listen(8000, function(){
    console.log('Server Running at http://localhost:8000');
 });
-
-
 
 //소켓서버 실행
 var io = socketio.listen(server);
@@ -181,4 +176,23 @@ app.post('/logout', (req, res) => {
 
 app.listen(app.get('port'), () => {
     console.log('Express server listening on port ' + app.get('port'));
+});
+
+app.post('/register', (req, res) => {
+
+    const name = req.body.inputUsername
+    const ID = req.body.inputStudentID
+    const dept = req.body.inputDeptName
+    const reason = req.body.inputReason
+
+    console.log("Registered ID = ", ID);
+    console.log("Registered name = ", name);
+    console.log("Registered dept = ", dept);
+    console.log("Registered reason = ", reason);
+
+    connection.query("insert into register values(" + "'" + ID + "','" + name + "','" + dept + "','" + reason + "')" , (error, rows) => {
+        if (error) throw error;
+        req.session.registered = true;
+        res.redirect('/Page_Login.html')
+    });
 });
