@@ -15,17 +15,31 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title text-center">Register</h5>
-                    <form class="form-signin">
+                    <form method="post" class="form-signin" action="http://localhost:8000/register">
                         <div class="form-label-group">
-                            <input type="text" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
+                            <input type="text" name="inputUsername" id="inputUsername" class="form-control" placeholder="Username" required autofocus>
                             <label for="inputUsername">Username</label>
                         </div>
 
                         <hr>
 
                         <div class="form-label-group">
-                            <input type="text" id="inputStudentID" class="form-control" placeholder="StudentID" required>
+                            <input type="text" name="inputStudentID" id="inputStudentID" class="form-control" placeholder="StudentID" required>
                             <label for="inputStudentID">Student ID</label>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-label-group">
+                            <input type="text" name="inputDeptName" id="inputDeptName" class="form-control" placeholder="Dept" required>
+                            <label for="inputDeptName">Department</label>
+                        </div>
+
+                        <hr>
+
+                        <div class="form-label-group">
+                            <input type="text" name="inputReason" id="inputReason" class="form-control" placeholder="Reason" required>
+                            <label for="inputReason">(복전/전과)</label>
                         </div>
 
                         <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" id="btn_register">Register</button>
@@ -46,7 +60,7 @@
 <script type="text/javascript">
     $(function () {
         $('#btn_register').click(function () {
-            alert($('#inputUsername').val())
+            alert('요청이 전송되었습니다.')
         })
     })
 </script>
