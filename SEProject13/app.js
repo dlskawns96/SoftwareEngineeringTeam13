@@ -84,18 +84,18 @@ app.get('/', (req, res) => {
    res.redirect('/login');
 });
 
-//'http://localhost:8000' 로 접속하면 예약현황화면('HTMLPage.html')을 보여준다.
+//'http://localhost:8000' 로 접속하면 예약현황화면('Page_Reservation.html')을 보여준다.
 app.get( '/reservation', function(req, res, next){
    console.log('Server home call');
-   // fs.readFile('HTMLPage.html', function(error, data){
+   // fs.readFile('Page_Reservation.html', function(error, data){
    //    res.send(data.toString());
    // });
-    res.redirect('/HTMLPage.html');
+    res.redirect('/Page_Reservation.html');
 });
 
 app.get('/login', function (req, res, next) {
     if(req.session.logined){
-        res.redirect('/HTMLPage.html');
+        res.redirect('/Page_Reservation.html');
     } else {
         console.log('Login page call');
         console.log(__dirname);
@@ -137,13 +137,6 @@ io.sockets.on( 'connect', function(socket){
 
       console.log('app data - date: ', seats_start_time[data.y][data.x].toLocaleString(), seats_end_time[data.y][data.x].toLocaleString());
 
-      const seatNum = 10 * y + x;
-/*
-       connection.query("insert into reservationlist values(" + "'" + ID + "','" + seatNum + "','" + dept + "','" + reason + "')" , (error, rows) => {
-           if (error) throw error;
-           req.session.reserved = true;
-       });
-*/
       //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
       io.sockets.emit('app', data);
    });
@@ -166,7 +159,7 @@ app.post('/users', (req, res) => {
             console.log(rows[0].name);
             req.session.logined = true;
             req.session.user_id = rows[0].ID;
-            res.redirect('/HTMLPage.html')
+            res.redirect('/Page_Reservation.html')
         }
         // console.log('User info is: ', rows);
         // res.send(rows);

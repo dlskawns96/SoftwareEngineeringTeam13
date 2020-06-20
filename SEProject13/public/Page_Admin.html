@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Title</title>
+    <style>
+        .Page_Admin_container {
+            width: 100vh;
+            height: 100vh;
+        }
+        .header {
+            height: 10%;
+            background-color: #0f0f0f;
+        }
+        .footer {
+            height: 10%;
+            background-color: #0f0f0f;
+        }
+        .main {
+            height: 80%;
+            border-spacing: 10px;
+        }
+        /*@media screen and (min-width:2000px) {*/
+        /*    .seat {*/
+        /*        width: 100px;*/
+        /*        height: 100px;*/
+        /*        font-size: medium;*/
+        /*    }*/
+        /*}*/
+        /*@media screen and (max-width:1300px){*/
+        /*    .seat {*/
+        /*        width: 30px;*/
+        /*        height: 30px;*/
+        /*    }*/
+        /*}*/
+        .bg-image {
+            /*background-image: url('https://source.unsplash.com/WEQbe2jBg40/600x1200');*/
+            /*background-size: cover;*/
+            /*background-position: center;*/
+            background-color: #F0BB94;
+            /*height: 100%;*/
+            border: #0f0f0f;
+            border-spacing: 10px;
+        }
+        .enable {background:#6A9993;}
+        .enable:hover{background: #36424A;}
+        .disable{background:#726F77;}
+    </style>
+    <link rel="stylesheet" href="CSS_Seatingmap.css">
+</head>
+<body>
+<div class="container-fluid Page_Admin_container">
+    <div class="row header">
+        <div class="col-xs-12">
+            <form action="/logout" method="post">
+                <button class=" btn btn-logout btn-primary btn-block text-uppercase font-weight-bold" type="submit" id="btn_logout">Logout</button>
+            </form>
+        </div>
+    </div>
+    <div class="row main">
+        <div class="col-md-6 infor"></div>
+        <div class="col-md-6  seat-wrapper align-self-center" id="seatingMap">
+            <h3><span class="label label-primary">Seating Map</span></h3>
+        </div>
+    </div>
+    <div class="row footer">
+        <div class="col-xs-12"></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+<!-- <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script> -->
+<!-- 소켓서버와 통신하기 위해 반드시 추가! -->
+<script src="socket.io.js"></script>
+<script>
+    var socket = io.connect('http://localhost:8000'); //소켓서버 접속
+    socket.on('app', function(data){
+        //클라언트 소켓에 'appr' 이벤트 설정
+        //서버에서 전달된 ​좌표에 해당하는 seat의 스타일을 'disable'로 변경
+        var $target = $('div[data-x = ' + data.x + '][data-y = ' + data.y + ']');
+        $target.removeClass('enable');
+        $target.addClass('disable');
+    });
+</script>
+<script type="text/javascript">
+    //각 좌석을 click 할 때 실행될 함수 정의
+    var onClickSeat = function(){
+
+        console.log("onClickSeat: ", new Date())
+        var x = $(this).attr('data-x');
+        var y = $(this).attr('data-y');
+
+        if( confirm('다른단어로 바꾸면 되겠다.') ){ //예약 확인용 confirm 화면 실행
+            $(this).off('click'); //clik 이벤트 제거
+            //소켓서버의 'app' 이벤트를 호출하면서 ​선택한 좌석죄표(x, y) 전송
+            socket.emit('app', {
+                x : x,
+                y : y
+            });
+        }else{
+            alert('Cancel!');
+        }
+    };
+
+
+    //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
+    $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
+
+        //data 파라미터에 저장된 좌석 정보를 Y축, X축으로 each()문을 돌려서
+
+        //좌석값에 따라(0, 1, 2) 적정한 스타일 시트를 적용한다.
+        $.each( data, function(indexY, line){
+            var $line = $( '<div></div>' ).addClass('line');
+            $.each(line, function(indexX, seat){
+                var $output = $( '<div></div>', {
+                    'class' : 'seat',
+                    'data-x' : indexX,
+                    'data-y' : indexY
+                }).appendTo($line);
+
+                if(seat == 1){ //좌석값이 '1'이면 'enable' 스타일을 적용하고 'click' 이벤트에 'onClickSeat()' 함수 적용
+                    $output.addClass('enable').on('click', onClickSeat);
+                }else if(seat == 2){ //좌석값이 '2' 이면 'disable' 스타일을 적용
+                    $output.addClass('disable');
+                }
+            });
+            $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
+
+        });
+    });
+</script>
+<link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
+<script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
+<script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
+<script src='//unpkg.com/bootstrap@4/dist/js/bootstrap.min.js'></script>
+</body>
+</html>
