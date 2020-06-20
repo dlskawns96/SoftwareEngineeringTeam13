@@ -53,7 +53,8 @@
         .enable {background:#6A9993;}
         .enable:hover{background: #36424A;}
         .disable{background:#726F77;}
-        .btn-logout{width: 50px}
+     #btn_logout {width: max-content}
+     #btn_reserve {width: max-content}
 
      .label {color: #3F6062;}
      .enable {background:#6A9993;}
@@ -78,74 +79,93 @@
     <div class="row no-gutter">
 
         <div class="d-flex flex-wrap col-md-4 col-lg-6 bg-image">
+            <div class="container contact contact-show">
+                <br>
+                <br>
+                <h3><span class="label label-primary">Reservation Page</span></h3>
+                <br>
+                <h5>Information</h5>
+                <div class="card col-lg-10">
+                    <div class="card-body col-lg-10">
+                        <label >ID </label>
 
-        <div id = "wrapper" class="d-flex align-content-around flex-wrap col-md-4 col-lg-6 bg-image">
-            <div id = "content">
-            <h3><span class="label label-primary">Reservation Page</span></h3>
-            <form action="/logout" method="post">
-            <button class=" btn btn-logout  btn-primary btn-block text-uppercase font-weight-bold" type="submit" id="btn_logout">Logout</button>
-            </form>
-            <div>
-                <form>
-                    <div>
-                    <h4><span class="label label-primary">시작 시간</span></h4>
-                    <select id="startTime" name="startTime" style="width:150px;height:30px;margin-bottom: 20px" onchange="getTime()">
-                        <option value="9"> 09 : 00
-                        <option value="10"> 10 : 00
-                        <option value="11"> 11 : 00
-                        <option value="12"> 12 : 00
-                        <option value="13"> 13 : 00
-                        <option value="14"> 14 : 00
-                        <option value="15"> 15 : 00
-                        <option value="16"> 16 : 00
-                        <option value="17"> 17 : 00
-                        <option value="18"> 18 : 00
-                        <option value="19"> 19 : 00
-                        <option value="20"> 20 : 00
-                        <option value="21"> 21 : 00
-                        <option value="22"> 22 : 00
+                        <br>
+                        <label>Reservation</label>
 
-                    </select>
+                        <form action="/logout" method="post" >
+                            <button class=" btn btn-logout btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit" id="btn_logout" width="3">Logout
+                            </button>
+                        </form>
                     </div>
-                    <div>
-                    <h4><span class="label label-primary">사용 시간</span></h4>
-                    <select id="usingTime" name="useTime" style="width:150px;height:30px;margin-bottom: 50px">
-                        <option value="1"> 1 hour
-                        <option value="2"> 2 hour
-                        <option value="3"> 3 hour
-                    </select>
+                </div>
+                <br>
+                <h5>Search</h5>
+                <div class="card col-lg-10">
+                    <div class="card-body col-lg-10" id = "content">
+                        <div>
+                            <form>
+                                <div>
+                                    <label><span class="label label-primary">시작 시간</span></label>
+                                    <select id="startTime" name="startTime" style="width:150px;height:30px;margin-bottom: 20px;margin-top:20px" onchange="getTime()">
+                                        <option value="9"> 09 : 00
+                                        <option value="10"> 10 : 00
+                                        <option value="11"> 11 : 00
+                                        <option value="12"> 12 : 00
+                                        <option value="13"> 13 : 00
+                                        <option value="14"> 14 : 00
+                                        <option value="15"> 15 : 00
+                                        <option value="16"> 16 : 00
+                                        <option value="17"> 17 : 00
+                                        <option value="18"> 18 : 00
+                                        <option value="19"> 19 : 00
+                                        <option value="20"> 20 : 00
+                                        <option value="21"> 21 : 00
+                                        <option value="22"> 22 : 00
+
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>사용 시간</label>
+                                    <select id="usingTime" name="useTime" style="width:150px;height:30px;margin-bottom:20px">
+                                        <option value="1"> 1 hour
+                                        <option value="2"> 2 hour
+                                        <option value="3"> 3 hour
+                                    </select>
+                                </div>
+
+                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit" id="btn_reserve"
+                                        onclick = "onClickSearch()" width="3">Search
+                                </button>
+                            </form>
+                        </div>
+                        <script type="text/javascript">
+                            var onClickSearch = function(){
+                                let startTime = $("#startTime option:selected").val();
+                                let usingTime = $("#usingTime option:selected").val();
+
+                                $.ajax({
+                                    url: 'http://localhost:8000/rsv',
+                                    async: true,
+                                    type: 'POST',
+                                    data: {
+                                        startTime: startTime,
+                                        usingTime: usingTime
+                                    },
+                                    dataType: 'json',
+                                    error: function(err){
+                                        alert("보내기 실패");
+                                    }
+                                })
+                                console.log(startTime, " ", usingTime);
+                            };
+
+                        </script>
                     </div>
-                    <button class="btn-primary btn-reserve text-uppercase" id="btn_reserve"
-                            type = "submit" onclick = "onClickSearch()" style="width:300px;height:30px;">Search</button>
-                </form>
+                </div>
+
             </div>
-            <script type="text/javascript">
-                var onClickSearch = function(){
-                    let startTime = $("#startTime option:selected").val();
-                    let usingTime = $("#usingTime option:selected").val();
 
-
-                    $.ajax({
-                        url: 'http://localhost:8000/rsv',
-                        async: true,
-                        type: 'POST',
-                        data: {
-                            startTime: startTime,
-                            usingTime: usingTime
-                        },
-                        dataType: 'json',
-                        error: function(err){
-                            alert("보내기 실패");
-                        }
-                    })
-                    console.log(startTime, " ", usingTime);
-                };
-
-
-            </script>
-            </div>
         </div>
-
         <div class="d-flex col-md-8 col-lg-6">
             <div class="container-fluid align-self-center seat-wrapper"  id="seatingMap">
                 <h3><span class="label label-primary">Seating Map</span></h3>
@@ -190,7 +210,6 @@
             alert('Cancel!');
         }
     };
-
 
     //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
     $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){

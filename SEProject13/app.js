@@ -145,12 +145,18 @@ io.sockets.on( 'connect', function(socket){
        // DB에 저장할 데이터들
        let startTime = data.startTime; // 시작 시간
        let usingTime = data.usingTime; // 사용 시간
+
        let seatNum = (data.y + data.x); // 좌석 번호 yx
 
        console.log(startTime, " ", usingTime, " ", seatNum);
-      console.log('app data - date: ', seats_start_time[data.y][data.x].toLocaleString(), seats_end_time[data.y][data.x].toLocaleString());
+       console.log('app data - date: ', seats_start_time[data.y][data.x].toLocaleString(), seats_end_time[data.y][data.x].toLocaleString());
 
-      //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
+       connection.query("insert into reservationlist values(" + "'" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
+           if (error) throw error;
+           console.log('reserve : ', seatNum)
+       });
+
+       //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
       io.sockets.emit('app', data);
    });
 });
@@ -158,7 +164,7 @@ io.sockets.on( 'connect', function(socket){
 // login
 // configuration =========================
 app.post('/users', (req, res) => {
-    const ID = req.body.inputID
+    global.ID = req.body.inputID
     console.log("Requested ID = ", ID);
     connection.query("SELECT * from studentlist where ID =" + "'" + ID + "'", (error, rows) => {
         if (error) throw error;
@@ -170,6 +176,7 @@ app.post('/users', (req, res) => {
             console.log("관리자 로그인");
             req.session.logined = true;
             req.session.user_id = rows[0].ID;
+            req.session.displayId = rows[0].ID;
             res.redirect('/Page_Admin.html')
         } else if(rows[0].ID == ID) {
             console.log("ID 일치");
