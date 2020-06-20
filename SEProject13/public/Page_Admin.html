@@ -21,19 +21,6 @@
             height: 80%;
             border-spacing: 10px;
         }
-        /*@media screen and (min-width:2000px) {*/
-        /*    .seat {*/
-        /*        width: 100px;*/
-        /*        height: 100px;*/
-        /*        font-size: medium;*/
-        /*    }*/
-        /*}*/
-        /*@media screen and (max-width:1300px){*/
-        /*    .seat {*/
-        /*        width: 30px;*/
-        /*        height: 30px;*/
-        /*    }*/
-        /*}*/
         .bg-image {
             /*background-image: url('https://source.unsplash.com/WEQbe2jBg40/600x1200');*/
             /*background-size: cover;*/
@@ -52,14 +39,29 @@
 <body>
 <div class="container-fluid Page_Admin_container">
     <div class="row header">
-        <div class="col-xs-12">
+        <div class="col-xs-12 ">
             <form action="/logout" method="post">
                 <button class=" btn btn-logout btn-primary btn-block text-uppercase font-weight-bold" type="submit" id="btn_logout">Logout</button>
             </form>
         </div>
     </div>
     <div class="row main">
-        <div class="col-md-6 infor"></div>
+        <div class="col-md-6 infor">
+            <table class="table" id="registerList">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Major</th>
+                    <th scope="col">Reason</th>
+                    <th scope="col">Approve</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
         <div class="col-md-6  seat-wrapper align-self-center" id="seatingMap">
             <h3><span class="label label-primary">Seating Map</span></h3>
         </div>
@@ -103,7 +105,6 @@
         }
     };
 
-
     //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
     $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
 
@@ -128,6 +129,24 @@
             $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
 
         });
+    });
+</script>
+<script type="text/javascript">
+    $(function() {
+        var registerList = [];
+
+        $.getJSON('http://localhost:8000/registerList', function(data) {
+            $.each(data , function(i, f) {
+                var tblRow = "<tr>" + "<th scope='row'>" + (i + 1) +"</th>" +
+                    "<td>" + f.ID + "</td>" +
+                    "<td>" + f.name + "</td>" + "<td>" + f.dept + "</td>" + "<td>" + f.reason + "</td>" +
+                    "<td><input type='button' class='btn btn-success' value='승인'/><input type='button' class='btn btn-danger' value='거부'/></td>" +
+                    "</tr>"
+                $(tblRow).appendTo("#registerList tbody");
+            });
+
+        });
+
     });
 </script>
 <link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">

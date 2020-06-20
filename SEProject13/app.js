@@ -151,11 +151,15 @@ app.post('/users', (req, res) => {
         if (error) throw error;
         console.log(rows.length);
         if (rows.length == 0) {
-            console.log("ID 불일치")
+            console.log("ID 불일치");
             res.redirect('/Page_Login.html')
-        }
-        else if(rows[0].ID == ID) {
-            console.log("ID 일치")
+        } else if(rows[0].ID == 'admin') {
+            console.log("관리자 로그인");
+            req.session.logined = true;
+            req.session.user_id = rows[0].ID;
+            res.redirect('/Page_Admin.html')
+        } else if(rows[0].ID == ID) {
+            console.log("ID 일치");
             console.log(rows[0].name);
             req.session.logined = true;
             req.session.user_id = rows[0].ID;
@@ -193,5 +197,21 @@ app.post('/register', (req, res) => {
     connection.query("insert into register values(" + "'" + ID + "','" + name + "','" + dept + "','" + reason + "')" , (error, rows) => {
         if (error) throw error;
         res.redirect('/Page_Login.html')
+    });
+});
+
+app.get('/registerList', (req, res, next) => {
+    var sql = 'SELECT * FROM register'; // 클럽목록
+
+    connection.query("SELECT * from register", (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            for(var i = 0; i < rows.length; i++) {
+                console.log(rows[i]);
+            }
+            res.send(rows);
+        }
+
     });
 });
