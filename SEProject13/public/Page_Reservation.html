@@ -194,7 +194,7 @@
     var socket = io.connect('http://localhost:8000'); //소켓서버 접속
     socket.on('app', function(data){
         //클라언트 소켓에 'appr' 이벤트 설정
-        //서버에서 전달된 ​좌표에 해당하는 seat의 스타일을 'disable'로 변경
+        //서버에서 전달된  좌표에 해당하는 seat의 스타일을 'disable'로 변경
         var $target = $('div[data-x = ' + data.x + '][data-y = ' + data.y + ']');
         $target.removeClass('enable');
         $target.addClass('disable');
@@ -212,7 +212,7 @@
 
         if( confirm('예약하시겠습니까?') ){ //예약 확인용 confirm 화면 실행
             $(this).off('click'); //clik 이벤트 제거
-            //소켓서버의 'app' 이벤트를 호출하면서 ​선택한 좌석죄표(x, y) 전송
+            //소켓서버의 'app' 이벤트를 호출하면서  선택한 좌석죄표(x, y) 전송
             socket.emit('app', {
                 x : x,
                 y : y,
