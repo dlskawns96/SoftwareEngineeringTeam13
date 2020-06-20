@@ -95,7 +95,20 @@ app.get( '/reservation', function(req, res, next){
 
 app.get('/login', function (req, res, next) {
     if(req.session.logined){
-        res.redirect('/Page_Reservation.html');
+        console.log('여기 들어가요')
+
+        var sql = 'SELECT * FROM reservationList where ID = ' + "'" + ID + "'";
+
+        connection.query(sql, (error, rows) => {
+            if(error) {
+                console.log("ERROR");
+            } else {
+                for(var i = 0; i < rows.length; i++) {
+                    console.log(rows[i]);
+                }
+                res.send(rows);
+            }
+        });
 
     } else {
         console.log('Login page call');
@@ -177,14 +190,12 @@ app.post('/users', (req, res) => {
         } else if(rows[0].ID == 'admin') {
             console.log("관리자 로그인");
             req.session.logined = true;
-            req.session.user_id = rows[0].ID;
-            req.session.displayId = rows[0].ID;
             res.redirect('/Page_Admin.html')
+
         } else if(rows[0].ID == ID) {
             console.log("ID 일치");
             console.log(rows[0].name);
             req.session.logined = true;
-
             res.redirect('/Page_Reservation.html')
         }
         // console.log('User info is: ', rows);

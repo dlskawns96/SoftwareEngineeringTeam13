@@ -48,6 +48,9 @@
          border: #0f0f0f;
          border-spacing: 10px;
      }
+     .bg-box {
+         background-color: #f6d4ba;
+     }
 
         .label {color: #3F6062;}
         .enable {background:#6A9993;}
@@ -87,10 +90,19 @@
                 <h5>Information</h5>
                 <div class="card col-lg-10">
                     <div class="card-body col-lg-10">
-                        <label>ID <%= user_id %></label>
 
-                        <br>
-                        <label>Reservation</label>
+                        <table class="table" id="information">
+                            <tr>
+                                <thread>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">#seat</th>
+                                    <th scope="col">startTime</th>
+                                    <th scope="col">usage</th>
+                                </thread>
+                            </tr>
+                            <tbody>
+                            </tbody>
+                        </table>
 
                         <form action="/logout" method="post" >
                             <button class=" btn btn-logout btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit" id="btn_logout" width="3">Logout
@@ -237,6 +249,21 @@
         });
     });
 </script>
+<script type="text/javascript">
+    $(function() {
+        $.getJSON('http://localhost:8000/login', function (data) {
+            $.each(data, function (i, f) {
+                var tblRow = "<tr>" +
+                    "<td>" + f.ID + "</td>" + "<td>" + f.seatNum + "</td>" +
+                    "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>"  +
+                     + "</tr>"
+                $(tblRow).appendTo("#information tbody");
+
+            });
+        });
+    });
+</script>
+
 
 <link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
 <script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
