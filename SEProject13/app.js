@@ -201,9 +201,9 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/registerList', (req, res, next) => {
-    var sql = 'SELECT * FROM register'; // 클럽목록
+    var sql = 'SELECT * FROM register';
 
-    connection.query("SELECT * from register", (error, rows) => {
+    connection.query(sql, (error, rows) => {
         if(error) {
             console.log("ERROR");
         } else {
@@ -212,6 +212,38 @@ app.get('/registerList', (req, res, next) => {
             }
             res.send(rows);
         }
+    });
+});
 
+app.get('/registerApprove', (req, res, next) => {
+    console.log(req.query.ID);
+    var sql = "DELETE FROM register WHERE ID=" + req.query.ID;
+
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            sql = "INSERT INTO studentList values(" + "'" + req.query.ID + "','" + req.query.name + "','" + req.query.dept + "')";
+            connection.query(sql, (error, rows) => {
+               if(error) {
+                   console.log("ERROR");
+               } else {
+                   console.log("사용자 추가 완료");
+                   res.redirect('/Page_Admin.html');
+               }
+            });
+        }
+    });
+});
+
+app.get('/registerReject', (req, res, next) => {
+    var sql = "DELETE FROM register WHERE ID=" + req.query.ID;
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log("사용자 삭제 완료");
+            res.redirect('/Page_Admin.html');
+        }
     });
 });

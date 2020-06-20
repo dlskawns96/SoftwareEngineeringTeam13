@@ -35,6 +35,10 @@
         .disable{background:#726F77;}
     </style>
     <link rel="stylesheet" href="CSS_Seatingmap.css">
+    <link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
+    <script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
+    <script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
+    <script src='//unpkg.com/bootstrap@4/dist/js/bootstrap.min.js'></script>
 </head>
 <body>
 <div class="container-fluid Page_Admin_container">
@@ -127,31 +131,54 @@
                 }
             });
             $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
-
         });
     });
 </script>
 <script type="text/javascript">
     $(function() {
-        var registerList = [];
-
         $.getJSON('http://localhost:8000/registerList', function(data) {
             $.each(data , function(i, f) {
                 var tblRow = "<tr>" + "<th scope='row'>" + (i + 1) +"</th>" +
                     "<td>" + f.ID + "</td>" +
                     "<td>" + f.name + "</td>" + "<td>" + f.dept + "</td>" + "<td>" + f.reason + "</td>" +
-                    "<td><input type='button' class='btn btn-success' value='승인'/><input type='button' class='btn btn-danger' value='거부'/></td>" +
+                    "<td><input type='button' class='btn btn-success approveBtn' id='registerBtn' value='승인'/><input type='button' class='btn btn-danger rejectBtn' id='registerBtn' value='거부'/></td>" +
                     "</tr>"
                 $(tblRow).appendTo("#registerList tbody");
             });
-
         });
 
+        $('#registerList').on('click', '#registerBtn', function () {
+            var tdArr = new Array();	// 배열 선언
+            var button = $(this);
+
+            // button.parent() : button의 부모는 <td>이다.
+            // button.parent().parent() : <td>의 부모이므로 <tr>이다.시
+
+            var tr = button.parent().parent();
+            var td = tr.children();
+
+            var ID = td.eq(1).text();
+            var name = td.eq(2).text();
+            var dept = td.eq(3).text();
+
+            console.log(button.attr('class').split(' ')[2]);
+
+            if (button.attr('class').split(' ')[2] == 'approveBtn') {
+                console.log("Approving...");
+                $.get( "/registerApprove", { ID: ID, name: name, dept: dept } )
+                    .done(function( data ) {
+                        location.reload();
+                    });
+            } else if(button.attr('class').split(' ')[2] == 'rejectBtn') {
+                console.log("Rejecting...");
+                $.get( "/registerReject", { ID: ID, name: name, dept: dept } )
+                    .done(function( data ) {
+                        location.reload();
+                    });
+            }
+        });
     });
 </script>
-<link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
-<script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
-<script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
-<script src='//unpkg.com/bootstrap@4/dist/js/bootstrap.min.js'></script>
+
 </body>
 </html>
