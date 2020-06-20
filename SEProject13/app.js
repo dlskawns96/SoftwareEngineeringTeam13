@@ -137,6 +137,13 @@ io.sockets.on( 'connect', function(socket){
 
       console.log('app data - date: ', seats_start_time[data.y][data.x].toLocaleString(), seats_end_time[data.y][data.x].toLocaleString());
 
+      const seatNum = 10 * y + x;
+/*
+       connection.query("insert into reservationlist values(" + "'" + ID + "','" + seatNum + "','" + dept + "','" + reason + "')" , (error, rows) => {
+           if (error) throw error;
+           req.session.reserved = true;
+       });
+*/
       //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
       io.sockets.emit('app', data);
    });
@@ -192,7 +199,6 @@ app.post('/register', (req, res) => {
 
     connection.query("insert into register values(" + "'" + ID + "','" + name + "','" + dept + "','" + reason + "')" , (error, rows) => {
         if (error) throw error;
-        req.session.registered = true;
         res.redirect('/Page_Login.html')
     });
 });
