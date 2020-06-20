@@ -166,9 +166,11 @@ io.sockets.on( 'connect', function(socket){
        console.log(startTime, " ", usingTime, " ", seatNum);
        console.log('app data - date: ', seats_start_time[data.y][data.x].toLocaleString(), seats_end_time[data.y][data.x].toLocaleString());
 
-       connection.query("insert into reservationlist values(" + "'" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
+       global.num = 0;
+       connection.query("insert into reservationlist values(" + num + ",'" + ID + "'," + seatNum +","+ startTime + "," + usingTime + ")" , (error, rows) => {
            if (error) throw error;
            console.log('reserve : ', seatNum)
+           num++;
        });
 
        //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
