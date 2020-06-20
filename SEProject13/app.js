@@ -76,6 +76,10 @@ var seats_end_time = [
 ];
 
 
+var start;
+var use;
+var finish;
+let numOfRsv;
 
 //Express 웹서버 생성
 var app = express();
@@ -135,14 +139,6 @@ app.get('/login', function (req, res, next) {
     // });
 })
 
-//'http://localhost:8000/seats' URL을 호출하면 그 순간의 좌석현황 정보를 전송한다.
-app.get('/seats', function(req, res, next){
-    console.log('Server Seats Call');
-    res.send(seats);
-
-});
-
-
 
 
 //웹서버 실행
@@ -161,7 +157,7 @@ io.sockets.on( 'connect', function(socket){
         //클라이언트가 'app' 이벤트를 호출하면 함께 전송된 좌석좌표(x, y)값을 예약완료상태(1 ->2)로 변경한다.
 
 
-        seats[data.y][data.x] = 2;
+        seats_by_time[data.y][data.x] = 2;
 
         // DB에 저장할 데이터들
         let startTime = data.startTime; // 시작 시간
@@ -174,36 +170,64 @@ io.sockets.on( 'connect', function(socket){
         console.log(startTime, " ", usingTime, " ", seatNum);
         console.log('app data - date: ', "start time : ", seats_start_time[data.y][data.x].toLocaleString(), "end time : ", seats_end_time[data.y][data.x].toLocaleString());
 
-        /*
-        connection.query("insert into reservationlist values(" + "'" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
+        numOfRsv++;
+        ID = '201835489';
+        connection.query("insert into reservationlist values(" + "'" + numOfRsv + "','" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
             if (error) throw error;
             console.log('reserve : ', seatNum)
         });
 
-         */
 
         //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
         io.sockets.emit('app', data);
     });
 });
 
-app.post("/rsv", (req, res) => {
-    const start = req.body.startTime;
-    const use = req.body.usingTime;
-    console.log(start, use);
 
+app.post("/rsv", (req, res) => {
+    start = req.body.startTime;
+    use = req.body.usingTime;
+    start = Number(start);
+    use = Number(use);
+    finish = start + use;
+
+    console.log(start, use);
+});
+
+app.get('/seats', (req, res) => {
     var sql = 'SELECT * FROM reservationlist';
 
     connection.query(sql, (error, rows) => {
         if(error) {
             console.log("ERROR");
         } else {
+            numOfRsv = rows.length;
             for(var i = 0; i < rows.length; i++) {
-                console.log(rows[i]);
+                //console.log(rows[i]);
+                var seatNum = rows[i].seatNum;
+                var seatX = seatNum % 100;
+                var seatY = (seatNum - seatX) / 100;
+                var startTime = rows[i].startTime;
+                var usingTime = rows[i].finishTime;
+                var finishTime = startTime + usingTime;
+                console.log(seatNum + " " + seatY + " " + seatX + " " + startTime + " " + finishTime);
+
+                if ((startTime < start && finishTime > start) || (startTime >= start && finishTime <= finish)
+                    || (startTime < finish && finishTime > finish)){
+                    seats_by_time[seatY][seatX] = 2;
+                    console.log(seats_by_time[seatY][seatX]);
+                }
             }
-            res.send(rows);
         }
     });
+
+    res.send(seats_by_time);
+
+    for(var i = 0; i < 11; i++){
+        for(var j = 0; j < 14; j++){
+            seats_by_time[i][j] = seats[i][j];
+        }
+    }
 });
 
 // login

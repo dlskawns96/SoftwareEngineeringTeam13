@@ -169,7 +169,6 @@
                                         alert("보내기 실패");
                                     }
                                 })
-                                console.log(startTime, " ", usingTime);
                             };
 
                         </script>
@@ -211,7 +210,7 @@
         var usingTime = $("#usingTime option:selected").val();
 
         if( confirm('예약하시겠습니까?') ){ //예약 확인용 confirm 화면 실행
-            $(this).off('click'); //clik 이벤트 제거
+           //$(this).off('click'); //clik 이벤트 제거
             //소켓서버의 'app' 이벤트를 호출하면서  선택한 좌석죄표(x, y) 전송
             socket.emit('app', {
                 x : x,
