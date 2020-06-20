@@ -112,6 +112,13 @@ app.get('/seats', function(req, res, next){
       res.send(seats);
 });
 
+app.post("/rsv", function(req, res){
+    const start = req.body.startTime;
+    const use = req.body.usingTime;
+    console.log(start, use);
+    res.json({ok:true});
+});
+
 
 //웹서버 실행
 var server = http.createServer(app);
@@ -135,6 +142,12 @@ io.sockets.on( 'connect', function(socket){
       end_date.setHours(end_date.getHours() + 3);
       seats_end_time[data.y][data.x] = end_date;
 
+       // DB에 저장할 데이터들
+       let startTime = data.startTime; // 시작 시간
+       let usingTime = data.usingTime; // 사용 시간
+       let seatNum = (data.y + data.x); // 좌석 번호 yx
+
+       console.log(startTime, " ", usingTime, " ", seatNum);
       console.log('app data - date: ', seats_start_time[data.y][data.x].toLocaleString(), seats_end_time[data.y][data.x].toLocaleString());
 
       //모든 클라이언트의 'app' 이벤트를 호출하여 예약 완료된 좌석 정보를 전달한다.(= public 통신)
