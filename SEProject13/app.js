@@ -96,6 +96,7 @@ app.get( '/reservation', function(req, res, next){
 app.get('/login', function (req, res, next) {
     if(req.session.logined){
         res.redirect('/Page_Reservation.html');
+
     } else {
         console.log('Login page call');
         console.log(__dirname);
@@ -110,6 +111,7 @@ app.get('/login', function (req, res, next) {
 app.get('/seats', function(req, res, next){
    console.log('Server Seats Call');
       res.send(seats);
+
 });
 
 app.post("/rsv", function(req, res){
@@ -182,7 +184,7 @@ app.post('/users', (req, res) => {
             console.log("ID 일치");
             console.log(rows[0].name);
             req.session.logined = true;
-            req.session.user_id = rows[0].ID;
+
             res.redirect('/Page_Reservation.html')
         }
         // console.log('User info is: ', rows);
