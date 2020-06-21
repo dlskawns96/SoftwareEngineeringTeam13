@@ -76,9 +76,9 @@ var seats_end_time = [
 ];
 
 
-var start;
-var use;
-var finish;
+var start = 9;
+var use = 1;
+var finish = 10;
 let numOfRsv;
 
 //Express 웹서버 생성
@@ -103,6 +103,16 @@ app.get('/', (req, res) => {
     res.redirect('/login');
 });
 
+app.get('/login', function (req, res, next) {
+    if(req.session.logined) {
+        res.redirect('/Page_Reservation.html');
+    } else {
+        console.log('Login Page call');
+        console.log(__dirname);
+        res.redirect('/Page_Login.html');
+    }
+})
+
 //'http://localhost:8000' 로 접속하면 예약현황화면('Page_Reservation.html')을 보여준다.
 app.get( '/reservation', function(req, res, next){
     console.log('Server home call');
@@ -112,33 +122,20 @@ app.get( '/reservation', function(req, res, next){
     res.redirect('/Page_Reservation.html');
 });
 
-app.get('/login', function (req, res, next) {
-    if(req.session.logined){
-        console.log('여기 들어가요')
+app.get('/info',function (req,res,next) {
+    console.log('여기 들어가요')
 
-        var sql = 'SELECT * FROM reservationList where ID = ' + "'" + ID + "'";
+    var sql = 'SELECT * FROM reservationList where ID = ' + "'" + ID + "'";
 
-        connection.query(sql, (error, rows) => {
-            if(error) {
-                console.log("ERROR");
-            } else {
-                for(var i = 0; i < rows.length; i++) {
-                    console.log(rows[i]);
-                }
-                res.send(rows);
-            }
-        });
-
-    } else {
-        console.log('Login page call');
-        console.log(__dirname);
-        res.redirect('/Page_Login.html');
-    }
-    // fs.readFile('Page_Login.html', function (error, data) {
-    //     res.send(data.toString());
-    // });
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
 })
-
 
 
 //웹서버 실행
@@ -156,7 +153,7 @@ io.sockets.on( 'connect', function(socket){
         console.log('app data', data)
         //클라이언트가 'app' 이벤트를 호출하면 함께 전송된 좌석좌표(x, y)값을 예약완료상태(1 ->2)로 변경한다.
 
-
+        console.log('app : ', data.x);
         seats_by_time[data.y][data.x] = 2;
 
         // DB에 저장할 데이터들
@@ -171,10 +168,11 @@ io.sockets.on( 'connect', function(socket){
         console.log('app data - date: ', "start time : ", seats_start_time[data.y][data.x].toLocaleString(), "end time : ", seats_end_time[data.y][data.x].toLocaleString());
 
         numOfRsv++;
-        ID = '201835489';
+
         connection.query("insert into reservationlist values(" + "'" + numOfRsv + "','" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
             if (error) throw error;
             console.log('reserve : ', seatNum)
+            console.log('ID : ', ID)
         });
 
 
@@ -190,9 +188,8 @@ app.post("/rsv", (req, res) => {
     start = Number(start);
     use = Number(use);
     finish = start + use;
-
-    console.log(start, use);
 });
+
 
 app.get('/seats', (req, res) => {
     var sql = 'SELECT * FROM reservationlist';
@@ -219,9 +216,10 @@ app.get('/seats', (req, res) => {
                 }
             }
         }
-    });
 
-    res.send(seats_by_time);
+        console.log(seats_by_time);
+        res.send(seats_by_time);
+    });
 
     for(var i = 0; i < 11; i++){
         for(var j = 0; j < 14; j++){

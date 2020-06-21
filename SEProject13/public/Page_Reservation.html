@@ -146,32 +146,11 @@
                                     </select>
                                 </div>
 
-                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit" id="btn_reserve"
-                                        onclick = "onClickSearch()" width="3">Search
+                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit"
+                                        id="btn_reserve" onclick = "onClickSearch()" width="3">Search
                                 </button>
                             </form>
                         </div>
-                        <script type="text/javascript">
-                            var onClickSearch = function(){
-                                let startTime = $("#startTime option:selected").val();
-                                let usingTime = $("#usingTime option:selected").val();
-
-                                $.ajax({
-                                    url: 'http://localhost:8000/rsv',
-                                    async: true,
-                                    type: 'POST',
-                                    data: {
-                                        startTime: startTime,
-                                        usingTime: usingTime
-                                    },
-                                    dataType: 'json',
-                                    error: function(err){
-                                        alert("보내기 실패");
-                                    }
-                                })
-                            };
-
-                        </script>
                     </div>
                 </div>
 
@@ -210,7 +189,7 @@
         var usingTime = $("#usingTime option:selected").val();
 
         if( confirm('예약하시겠습니까?') ){ //예약 확인용 confirm 화면 실행
-           //$(this).off('click'); //clik 이벤트 제거
+            //$(this).off('click'); //clik 이벤트 제거
             //소켓서버의 'app' 이벤트를 호출하면서  선택한 좌석죄표(x, y) 전송
             socket.emit('app', {
                 x : x,
@@ -223,7 +202,29 @@
         }
     };
 
-    //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
+    var startTime;
+    var usingTime;
+    var onClickSearch = function(){
+        startTime = $("#startTime option:selected").val();
+        usingTime = $("#usingTime option:selected").val();
+
+        $.ajax({
+            url: 'http://localhost:8000/rsv',
+            async: true,
+            type: 'POST',
+            data: {
+                startTime: startTime,
+                usingTime: usingTime
+            },
+            dataType: 'json',
+            error: function(err){
+                alert("보내기 실패");
+            }
+        })
+
+        $.getJSON('http://localhost:8000/seats');
+    };
+
     $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
 
         //data 파라미터에 저장된 좌석 정보를 Y축, X축으로 each()문을 돌려서
@@ -247,7 +248,9 @@
             $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
         });
     });
+
 </script>
+
 <script type="text/javascript">
     $(function() {
         $.getJSON('http://localhost:8000/login', function (data) {
@@ -256,14 +259,12 @@
                     "<td>" + f.ID + "</td>" + "<td>" + f.seatNum + "</td>" +
                     "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>"  +
                     + "</tr>"
-                $(tblRow).appendTo("#information tbody");
+                $(tblRow).appendTo($("#information tbody"));
 
             });
         });
     });
 </script>
-
-
 <link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
 <script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
 <script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
