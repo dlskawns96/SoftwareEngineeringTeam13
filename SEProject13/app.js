@@ -137,6 +137,19 @@ app.get('/info',function (req,res,next) {
     });
 })
 
+app.get('/getReservationList', function (req, res, next) {
+    var sql = 'SELECT * FROM reservationList';
+
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
+});
+
 
 //웹서버 실행
 var server = http.createServer(app);
@@ -188,6 +201,8 @@ app.post("/rsv", (req, res) => {
     start = Number(start);
     use = Number(use);
     finish = start + use;
+    // res.send(String(start), String(use));
+    res.status().send(req.body);
 });
 
 
@@ -328,6 +343,19 @@ app.get('/registerReject', (req, res, next) => {
             console.log("ERROR");
         } else {
             console.log("사용자 삭제 완료");
+            res.redirect('/Page_Admin.html');
+        }
+    });
+});
+
+app.get('/reservationCancel', (req, res, next) => {
+    var sql = "DELETE FROM reservationList WHERE ID=" + req.query.ID + " AND " + "startTime ="  + req.query.startTime;
+    console.log(sql);
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log("예약 취소 완료");
             res.redirect('/Page_Admin.html');
         }
     });
