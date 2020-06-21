@@ -271,6 +271,54 @@
             $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
         });
     });
+
+    var Date = new Date();
+    var nowTime = Date.getHours();
+
+    if(nowTime < 22) {
+        if (nowTime >= 9) {
+            $("#startTime option[value='9']").remove();
+        }
+        if (nowTime >= 10) {
+            $("#startTime option[value='10']").remove();
+        }
+        if (nowTime >= 11) {
+            $("#startTime option[value='11']").remove();
+        }
+        if (nowTime >= 12) {
+            $("#startTime option[value='12']").remove();
+        }
+        if (nowTime >= 13) {
+            $("#startTime option[value='13']").remove();
+        }
+        if (nowTime >= 14) {
+            $("#startTime option[value='14']").remove();
+        }
+        if (nowTime >= 15) {
+            $("#startTime option[value='15']").remove();
+        }
+        if (nowTime >= 16) {
+            $("#startTime option[value='16']").remove();
+        }
+        if (nowTime >= 17) {
+            $("#startTime option[value='17']").remove();
+        }
+        if (nowTime >= 18) {
+            $("#startTime option[value='18']").remove();
+        }
+        if (nowTime >= 19) {
+            $("#startTime option[value='19']").remove();
+        }
+        if (nowTime >= 20) {
+            $("#startTime option[value='20']").remove();
+            $("#usingTime option[value='3']").remove();
+        }
+        if (nowTime >= 21) {
+            $("#startTime option[value='21']").remove();
+            $("#usingTime option[value='2']").remove();
+        }
+    }
+
 </script>
 <script type="text/javascript">
     $(function() {
