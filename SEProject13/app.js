@@ -112,33 +112,20 @@ app.get( '/reservation', function(req, res, next){
     res.redirect('/Page_Reservation.html');
 });
 
-app.get('/login', function (req, res, next) {
-    if(req.session.logined){
-        console.log('여기 들어가요')
+app.get('/info',function (req,res,next) {
+    console.log('여기 들어가요')
 
-        var sql = 'SELECT * FROM reservationList where ID = ' + "'" + ID + "'";
+    var sql = 'SELECT * FROM reservationList where ID = ' + "'" + ID + "'";
 
-        connection.query(sql, (error, rows) => {
-            if(error) {
-                console.log("ERROR");
-            } else {
-                for(var i = 0; i < rows.length; i++) {
-                    console.log(rows[i]);
-                }
-                res.send(rows);
-            }
-        });
-
-    } else {
-        console.log('Login page call');
-        console.log(__dirname);
-        res.redirect('/Page_Login.html');
-    }
-    // fs.readFile('Page_Login.html', function (error, data) {
-    //     res.send(data.toString());
-    // });
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
 })
-
 
 
 //웹서버 실행
@@ -171,10 +158,11 @@ io.sockets.on( 'connect', function(socket){
         console.log('app data - date: ', "start time : ", seats_start_time[data.y][data.x].toLocaleString(), "end time : ", seats_end_time[data.y][data.x].toLocaleString());
 
         numOfRsv++;
-        ID = '201835489';
+
         connection.query("insert into reservationlist values(" + "'" + numOfRsv + "','" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
             if (error) throw error;
             console.log('reserve : ', seatNum)
+            console.log('ID : ', ID)
         });
 
 
@@ -193,6 +181,7 @@ app.post("/rsv", (req, res) => {
 
     console.log(start, use);
 });
+
 
 app.get('/seats', (req, res) => {
     var sql = 'SELECT * FROM reservationlist';

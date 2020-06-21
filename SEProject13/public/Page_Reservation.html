@@ -91,15 +91,15 @@
                 <div class="card col-lg-10">
                     <div class="card-body col-lg-10">
 
-                        <table class="table" id="information">
-                            <tr>
-                                <thread>
+                        <table class="table" id="informationList">
+                            <thead>
+                                <tr>
                                     <th scope="col">ID</th>
                                     <th scope="col">#seat</th>
                                     <th scope="col">startTime</th>
                                     <th scope="col">usage</th>
-                                </thread>
-                            </tr>
+                                </tr>
+                            </thead>
                             <tbody>
                             </tbody>
                         </table>
@@ -146,8 +146,8 @@
                                     </select>
                                 </div>
 
-                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit" id="btn_reserve"
-                                        onclick = "onClickSearch()" width="3">Search
+                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit"
+                                        id="btn_reserve" onclick = "onClickSearch()" width="3">Search
                                 </button>
                             </form>
                         </div>
@@ -169,6 +169,30 @@
                                         alert("보내기 실패");
                                     }
                                 })
+
+                                $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
+
+                                    //data 파라미터에 저장된 좌석 정보를 Y축, X축으로 each()문을 돌려서
+
+                                    //좌석값에 따라(0, 1, 2) 적정한 스타일 시트를 적용한다.
+                                    $.each( data, function(indexY, line){
+                                        var $line = $( '<div></div>' ).addClass('line');
+                                        $.each(line, function(indexX, seat){
+                                            var $output = $( '<div></div>', {
+                                                'class' : 'seat',
+                                                'data-x' : indexX,
+                                                'data-y' : indexY
+                                            }).appendTo($line);
+
+                                            if(seat == 1){ //좌석값이 '1'이면 'enable' 스타일을 적용하고 'click' 이벤트에 'onClickSeat()' 함수 적용
+                                                $output.addClass('enable').on('click', onClickSeat);
+                                            }else if(seat == 2){ //좌석값이 '2' 이면 'disable' 스타일을 적용
+                                                $output.addClass('disable');
+                                            }
+                                        });
+                                        $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
+                                    });
+                                });
                             };
 
                         </script>
@@ -250,20 +274,21 @@
 </script>
 <script type="text/javascript">
     $(function() {
-        $.getJSON('http://localhost:8000/login', function (data) {
+        $.getJSON('http://localhost:8000/info', function (data) {
             $.each(data, function (i, f) {
+                var y = f.seatNum % 100;
+                var x = (f.seatNum - y) / 100;
+                seatNum = x + "-" + y;
                 var tblRow = "<tr>" +
-                    "<td>" + f.ID + "</td>" + "<td>" + f.seatNum + "</td>" +
-                    "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>"  +
-                    + "</tr>"
-                $(tblRow).appendTo("#information tbody");
+                    "<td>" + f.ID + "</td>" +
+                    "<td>" + seatNum  + "</td>" + "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>" +
+                    "</tr>"
+                $(tblRow).appendTo("#informationList tbody");
 
             });
         });
     });
 </script>
-
-
 <link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
 <script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
 <script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
