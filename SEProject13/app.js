@@ -137,6 +137,18 @@ app.get('/info',function (req,res,next) {
     });
 })
 
+app.get('/getReservationList', function (req, res, next) {
+    var sql = 'SELECT * FROM reservationList';
+
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log(rows);
+            res.send(rows);
+        }
+    });
+});
 
 //웹서버 실행
 var server = http.createServer(app);
@@ -188,6 +200,11 @@ app.post("/rsv", (req, res) => {
     start = Number(start);
     use = Number(use);
     finish = start + use;
+<<<<<<< HEAD
+=======
+    // res.send(String(start), String(use));
+    res.status().send(req.body);
+>>>>>>> d98872007d63224c294cee74e44c68ce70281752
 });
 
 
@@ -217,9 +234,14 @@ app.get('/seats', (req, res) => {
             }
         }
 
+<<<<<<< HEAD
         //console.log(seats_by_time);
         res.send(seats_by_time);
 
+=======
+        console.log(seats_by_time);
+        res.send(seats_by_time);
+>>>>>>> d98872007d63224c294cee74e44c68ce70281752
     });
 
     for(var i = 0; i < 11; i++){
@@ -329,6 +351,19 @@ app.get('/registerReject', (req, res, next) => {
             console.log("ERROR");
         } else {
             console.log("사용자 삭제 완료");
+            res.redirect('/Page_Admin.html');
+        }
+    });
+});
+
+app.get('/reservationCancel', (req, res, next) => {
+    var sql = "DELETE FROM reservationList WHERE ID=" + req.query.ID + " AND " + "startTime ="  + req.query.startTime;
+    console.log(sql);
+    connection.query(sql, (error, rows) => {
+        if(error) {
+            console.log("ERROR");
+        } else {
+            console.log("예약 취소 완료");
             res.redirect('/Page_Admin.html');
         }
     });
