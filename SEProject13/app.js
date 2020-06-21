@@ -150,6 +150,7 @@ app.get('/getReservationList', function (req, res, next) {
     });
 });
 
+
 //웹서버 실행
 var server = http.createServer(app);
 server.listen(8000, function(){
@@ -200,11 +201,8 @@ app.post("/rsv", (req, res) => {
     start = Number(start);
     use = Number(use);
     finish = start + use;
-<<<<<<< HEAD
-=======
     // res.send(String(start), String(use));
     res.status().send(req.body);
->>>>>>> d98872007d63224c294cee74e44c68ce70281752
 });
 
 
@@ -234,14 +232,8 @@ app.get('/seats', (req, res) => {
             }
         }
 
-<<<<<<< HEAD
-        //console.log(seats_by_time);
-        res.send(seats_by_time);
-
-=======
         console.log(seats_by_time);
         res.send(seats_by_time);
->>>>>>> d98872007d63224c294cee74e44c68ce70281752
     });
 
     for(var i = 0; i < 11; i++){
