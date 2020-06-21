@@ -217,8 +217,9 @@ app.get('/seats', (req, res) => {
             }
         }
 
-        console.log(seats_by_time);
+        //console.log(seats_by_time);
         res.send(seats_by_time);
+
     });
 
     for(var i = 0; i < 11; i++){
