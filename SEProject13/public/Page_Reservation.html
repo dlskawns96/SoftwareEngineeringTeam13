@@ -39,30 +39,30 @@
             border-spacing: 10px;
         }
 
-     .bg-image {
-         /*background-image: url('https://source.unsplash.com/WEQbe2jBg40/600x1200');*/
-         /*background-size: cover;*/
-         /*background-position: center;*/
-         background-color: #F0BB94;
-         min-height: 100vh;
-         border: #0f0f0f;
-         border-spacing: 10px;
-     }
-     .bg-box {
-         background-color: #f6d4ba;
-     }
+        .bg-image {
+            /*background-image: url('https://source.unsplash.com/WEQbe2jBg40/600x1200');*/
+            /*background-size: cover;*/
+            /*background-position: center;*/
+            background-color: #F0BB94;
+            min-height: 100vh;
+            border: #0f0f0f;
+            border-spacing: 10px;
+        }
+        .bg-box {
+            background-color: #f6d4ba;
+        }
 
         .label {color: #3F6062;}
         .enable {background:#6A9993;}
         .enable:hover{background: #36424A;}
         .disable{background:#726F77;}
-     #btn_logout {width: max-content}
-     #btn_reserve {width: max-content}
+        #btn_logout {width: max-content}
+        #btn_reserve {width: max-content}
 
-     .label {color: #3F6062;}
-     .enable {background:#6A9993;}
-     .enable:hover{background: #36424A;}
-     .disable{background:#726F77;}
+        .label {color: #3F6062;}
+        .enable {background:#6A9993;}
+        .enable:hover{background: #36424A;}
+        .disable{background:#726F77;}
         #wrapper{
             display:table;
         }
@@ -74,8 +74,8 @@
 
 </head>
 
-    <link rel="stylesheet" href="CSS_Seatingmap.css">
-  </head>
+<link rel="stylesheet" href="CSS_Seatingmap.css">
+</head>
 
 <body>
 <div class="container-fluid">
@@ -91,15 +91,15 @@
                 <div class="card col-lg-10">
                     <div class="card-body col-lg-10">
 
-                        <table class="table" id="information">
-                            <tr>
-                                <thread>
+                        <table class="table" id="informationList">
+                            <thead>
+                                <tr>
                                     <th scope="col">ID</th>
                                     <th scope="col">#seat</th>
                                     <th scope="col">startTime</th>
                                     <th scope="col">usage</th>
-                                </thread>
-                            </tr>
+                                </tr>
+                            </thead>
                             <tbody>
                             </tbody>
                         </table>
@@ -146,8 +146,8 @@
                                     </select>
                                 </div>
 
-                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit" id="btn_reserve"
-                                        onclick = "onClickSearch()" width="3">Search
+                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit"
+                                        id="btn_reserve" onclick = "onClickSearch()" width="3">Search
                                 </button>
                             </form>
                         </div>
@@ -169,7 +169,30 @@
                                         alert("보내기 실패");
                                     }
                                 })
-                                console.log(startTime, " ", usingTime);
+
+                                $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
+
+                                    //data 파라미터에 저장된 좌석 정보를 Y축, X축으로 each()문을 돌려서
+
+                                    //좌석값에 따라(0, 1, 2) 적정한 스타일 시트를 적용한다.
+                                    $.each( data, function(indexY, line){
+                                        var $line = $( '<div></div>' ).addClass('line');
+                                        $.each(line, function(indexX, seat){
+                                            var $output = $( '<div></div>', {
+                                                'class' : 'seat',
+                                                'data-x' : indexX,
+                                                'data-y' : indexY
+                                            }).appendTo($line);
+
+                                            if(seat == 1){ //좌석값이 '1'이면 'enable' 스타일을 적용하고 'click' 이벤트에 'onClickSeat()' 함수 적용
+                                                $output.addClass('enable').on('click', onClickSeat);
+                                            }else if(seat == 2){ //좌석값이 '2' 이면 'disable' 스타일을 적용
+                                                $output.addClass('disable');
+                                            }
+                                        });
+                                        $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
+                                    });
+                                });
                             };
 
                         </script>
@@ -194,7 +217,7 @@
     var socket = io.connect('http://localhost:8000'); //소켓서버 접속
     socket.on('app', function(data){
         //클라언트 소켓에 'appr' 이벤트 설정
-        //서버에서 전달된 ​좌표에 해당하는 seat의 스타일을 'disable'로 변경
+        //서버에서 전달된  좌표에 해당하는 seat의 스타일을 'disable'로 변경
         var $target = $('div[data-x = ' + data.x + '][data-y = ' + data.y + ']');
         $target.removeClass('enable');
         $target.addClass('disable');
@@ -211,8 +234,8 @@
         var usingTime = $("#usingTime option:selected").val();
 
         if( confirm('예약하시겠습니까?') ){ //예약 확인용 confirm 화면 실행
-            $(this).off('click'); //clik 이벤트 제거
-            //소켓서버의 'app' 이벤트를 호출하면서 ​선택한 좌석죄표(x, y) 전송
+           //$(this).off('click'); //clik 이벤트 제거
+            //소켓서버의 'app' 이벤트를 호출하면서  선택한 좌석죄표(x, y) 전송
             socket.emit('app', {
                 x : x,
                 y : y,
@@ -251,23 +274,21 @@
 </script>
 <script type="text/javascript">
     $(function() {
-        $.getJSON('http://localhost:8000/login', function (data) {
+        $.getJSON('http://localhost:8000/info', function (data) {
             $.each(data, function (i, f) {
+                var y = f.seatNum % 100;
+                var x = (f.seatNum - y) / 100;
+                seatNum = x + "-" + y;
                 var tblRow = "<tr>" +
-                    "<td>" + f.ID + "</td>" + "<td>" + f.seatNum + "</td>" +
-                    "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>"  +
-                     + "</tr>"
-                $(tblRow).appendTo("#information tbody");
+                    "<td>" + f.ID + "</td>" +
+                    "<td>" + seatNum  + "</td>" + "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>" +
+                    "</tr>"
+                $(tblRow).appendTo("#informationList tbody");
 
             });
         });
     });
 </script>
-<script type = "text/javascript">
-    let today = new Date();
-    
-</script>
-
 <link rel="stylesheet" href="//unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
 <script src='//unpkg.com/jquery@3/dist/jquery.min.js'></script>
 <script src='//unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
