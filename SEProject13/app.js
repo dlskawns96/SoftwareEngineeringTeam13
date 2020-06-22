@@ -247,6 +247,7 @@ app.get('/seats', (req, res) => {
             seats_by_time[i][j] = seats[i][j];
         }
     }
+    console.log("seat 전송해줬음");
 });
 
 // login
@@ -356,23 +357,13 @@ app.get('/registerReject', (req, res, next) => {
 
 app.get('/reservationCancel', (req, res, next) => {
     var sql = "DELETE FROM reservationList WHERE ID=" + req.query.ID + " AND " + "startTime ="  + req.query.startTime;
+    console.log(sql);
     connection.query(sql, (error, rows) => {
         if(error) {
             console.log("ERROR");
         } else {
             console.log("예약 취소 완료");
             res.redirect('/Page_Admin.html');
-        }
-    });
-});
-
-app.get('/getReservationListBySeatNum', function (req, res, next) {
-    var sql = 'SELECT * FROM reservationList WHERE seatNum = ' + req.query.seatNum;
-    connection.query(sql, (error, rows) => {
-        if(error) {
-            console.log("ERROR");
-        } else {
-            res.send(rows);
         }
     });
 });
