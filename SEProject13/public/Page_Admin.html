@@ -88,6 +88,36 @@
         <div class="col-xs-12"></div>
     </div>
 </div>
+<!--모달 테스-->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">좌석 정보</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <table class="table" id="modalReservationList">
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">#seat</th>
+                        <th scope="col">startTime</th>
+                        <th scope="col">usage</th>
+                        <th scope="col">cancel</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <link rel="stylesheet" href="http://unpkg.com/bootstrap@4/dist/css/bootstrap.min.css">
 <script src='http://unpkg.com/jquery@3/dist/jquery.min.js'></script>
 <script src='http://unpkg.com/popper.js@1/dist/umd/popper.min.js'></script>
@@ -107,22 +137,53 @@
     //각 좌석을 click 할 때 실행될 함수 정의
     var onClickSeat = function(){
 
-        console.log("onClickSeat: ", new Date())
         var x = $(this).attr('data-x');
         var y = $(this).attr('data-y');
 
-        if( confirm('다른단어로 바꾸면 되겠다.') ){ //예약 확인용 confirm 화면 실행
-            $(this).off('click'); //clik 이벤트 제거
-            //소켓서버의 'app' 이벤트를 호출하면서 ​선택한 좌석죄표(x, y) 전송
-            socket.emit('app', {
-                x : x,
-                y : y
+        seat = Number(y) * 100 + Number(x);
+
+        $.get( "/getReservationListBySeatNum", { seatNum: seat} )
+            .done(function( data ) {
+                $.each(data, function (i, f) {
+                    var y = f.seatNum % 100;
+                    var x = (f.seatNum - y) / 100;
+                    seatNum = x + "-" + y;
+                    var tblRow = "<tr>" +
+                        "<td>" + f.ID + "</td>" +
+                        "<td>" + seatNum  + "</td>" + "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>" +
+                        "<td><input type='button' class='btn btn-danger cancelBtn' id='cancelBtn' value='취소'/></td>" +
+                        "</tr>"
+                    $(tblRow).appendTo("#modalReservationList tbody");
+
+                });
+                $('#modalReservationList').on('click', '#cancelBtn', function () {
+                    var button = $(this);
+
+                    var tr = button.parent().parent();
+                    var td = tr.children();
+
+                    var ID = td.eq(0).text();
+                    var startTime = td.eq(2).text();
+
+                    $.get( "/reservationCancel", { ID: ID, startTime: startTime })
+                        .done(function( data ) {
+                            location.reload();
+                        });
+                });
+                $('#myModal').modal('toggle')
             });
-        }else{
-            alert('Cancel!');
-        }
     };
 
+    $.ajax({
+        url: 'http://localhost:8000/rsv',
+        async: true,
+        type: 'POST',
+        data: {
+            startTime: "9",
+            usingTime: "13"
+        },
+        dataType: 'json'
+    })
     //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
     $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
 
@@ -133,7 +194,7 @@
             var $line = $( '<div></div>' ).addClass('line');
             $.each(line, function(indexX, seat){
                 var $output = $( '<div></div>', {
-                    'class' : 'seat',
+                    'class' : 'seat ',
                     'data-x' : indexX,
                     'data-y' : indexY
                 }).appendTo($line);
@@ -141,7 +202,7 @@
                 if(seat == 1){ //좌석값이 '1'이면 'enable' 스타일을 적용하고 'click' 이벤트에 'onClickSeat()' 함수 적용
                     $output.addClass('enable').on('click', onClickSeat);
                 }else if(seat == 2){ //좌석값이 '2' 이면 'disable' 스타일을 적용
-                    $output.addClass('disable');
+                    $output.addClass('disable').on('click', onClickSeat);
                 }
             });
             $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
@@ -162,11 +223,7 @@
         });
 
         $('#registerList').on('click', '#registerBtn', function () {
-            var tdArr = new Array();	// 배열 선언
             var button = $(this);
-
-            // button.parent() : button의 부모는 <td>이다.
-            // button.parent().parent() : <td>의 부모이므로 <tr>이다.시
 
             var tr = button.parent().parent();
             var td = tr.children();
@@ -226,8 +283,6 @@
                 .done(function( data ) {
                     location.reload();
                 });
-
-
         });
     });
 </script>
