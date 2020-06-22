@@ -182,10 +182,7 @@
             startTime: "9",
             usingTime: "13"
         },
-        dataType: 'json',
-        error: function(err){
-            alert("보내기 실패");
-        }
+        dataType: 'json'
     })
     //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
     $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
