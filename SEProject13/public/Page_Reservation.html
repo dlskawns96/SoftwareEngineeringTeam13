@@ -133,7 +133,6 @@
                                         <option value="19"> 19 : 00
                                         <option value="20"> 20 : 00
                                         <option value="21"> 21 : 00
-                                        <option value="22"> 22 : 00
 
                                     </select>
                                 </div>
@@ -146,7 +145,7 @@
                                     </select>
                                 </div>
 
-                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="submit"
+                                <button class=" btn btn-reserve btn-primary btn-sm btn-block text-uppercase font-weight-bold" type="button"
                                         id="btn_reserve" onclick = "onClickSearch()" width="3">Search
                                 </button>
                             </form>
@@ -166,6 +165,8 @@
                                     },
                                     dataType: 'json',
                                 });
+
+                                $('div').remove('.line');
 
                                 $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
 
