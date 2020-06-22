@@ -3,12 +3,12 @@ var express = require('express');
 var http = require('http');
 var fs = require('fs');
 
-const mysql      = require('mysql');
-const dbconfig   = require('./config/database');
+const mysql = require('mysql');
+const dbconfig = require('./config/database');
 const connection = mysql.createConnection(dbconfig);
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const serveStatic  = require('serve-static');
+const serveStatic = require('serve-static');
 const path = require('path');
 const cors = require('cors');
 
@@ -99,10 +99,10 @@ app.use(cookieParser());
 app.use(expressSession({
     secret: 'keyboard cat',
     resave: false,
-    saveUninitialized:true,
+    saveUninitialized: true,
     store: new fileStore()
 }));
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
     // 해당미들웨어의 config가 위치한뒤 next()로 다음 미들웨어로 넘어가도록 처리한다.
     next()
 })
@@ -112,7 +112,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', function (req, res, next) {
-    if(req.session.logined) {
+    if (req.session.logined) {
         res.redirect('/Page_Reservation.html');
     } else {
         console.log('Login Page call');
@@ -122,7 +122,7 @@ app.get('/login', function (req, res, next) {
 })
 
 //'http://localhost:8000' 로 접속하면 예약현황화면('Page_Reservation.html')을 보여준다.
-app.get( '/reservation', function(req, res, next){
+app.get('/reservation', function (req, res, next) {
     console.log('Server home call');
     // fs.readFile('Page_Reservation.html', function(error, data){
     //    res.send(data.toString());
@@ -130,13 +130,13 @@ app.get( '/reservation', function(req, res, next){
     res.redirect('/Page_Reservation.html');
 });
 
-app.get('/info',function (req,res,next) {
+app.get('/info', function (req, res, next) {
     console.log('여기 들어가요')
 
     var sql = 'SELECT * FROM reservationList where ID = ' + "'" + ID + "'";
 
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
             console.log(rows);
@@ -149,7 +149,7 @@ app.get('/getReservationList', function (req, res, next) {
     var sql = 'SELECT * FROM reservationList';
 
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
             console.log(rows);
@@ -161,16 +161,16 @@ app.get('/getReservationList', function (req, res, next) {
 
 //웹서버 실행
 var server = http.createServer(app);
-server.listen(8000, function(){
+server.listen(8000, function () {
     console.log('Server Running at http://localhost:8000');
 });
 
 //소켓서버 실행
 var io = socketio.listen(server);
-io.sockets.on( 'connect', function(socket){
+io.sockets.on('connect', function (socket) {
 
     //socket 서버에 'app' 이벤트 설정
-    socket.on( 'app', function(data){
+    socket.on('app', function (data) {
         console.log('app data', data)
         //클라이언트가 'app' 이벤트를 호출하면 함께 전송된 좌석좌표(x, y)값을 예약완료상태(1 ->2)로 변경한다.
 
@@ -190,7 +190,7 @@ io.sockets.on( 'connect', function(socket){
 
         numOfRsv++;
 
-        connection.query("insert into reservationlist values(" + "'" + numOfRsv + "','" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')" , (error, rows) => {
+        connection.query("insert into reservationlist values(" + "'" + numOfRsv + "','" + ID + "','" + seatNum + "','" + startTime + "','" + usingTime + "')", (error, rows) => {
             if (error) throw error;
             console.log('reserve : ', seatNum)
             console.log('ID : ', ID)
@@ -215,26 +215,35 @@ app.post("/rsv", (req, res) => {
 app.get('/seats', (req, res) => {
     var sql = 'SELECT * FROM reservationlist';
 
+    var Now = new Date();
+    var nowTime = Now.getHours();
+
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
             numOfRsv = rows.length;
-            for(var i = 0; i < rows.length; i++) {
-                //console.log(rows[i]);
+            for (var i = 0; i < rows.length; i++) {
+                if (Number(rows[i].startTime) + Number(rows[i].finishTime) <= nowTime) {
+                    connection.query('delete from reservationList where seatNum=' + "'"
+                        + rows[i].seatNum + "'");
+                    if (error) throw error;
+
+                }
                 var seatNum = rows[i].seatNum;
                 var seatX = seatNum % 100;
                 var seatY = (seatNum - seatX) / 100;
                 var startTime = rows[i].startTime;
                 var usingTime = rows[i].finishTime;
                 var finishTime = startTime + usingTime;
-                // console.log(seatNum + " " + seatY + " " + seatX + " " + startTime + " " + finishTime);
+                console.log(seatNum + " " + seatY + " " + seatX + " " + startTime + " " + finishTime);
 
                 if ((startTime < start && finishTime > start) || (startTime >= start && finishTime <= finish)
-                    || (startTime < finish && finishTime > finish)){
+                    || (startTime < finish && finishTime > finish)) {
                     seats_by_time[seatY][seatX] = 2;
-                    // console.log(seats_by_time[seatY][seatX]);
+                    console.log(seats_by_time[seatY][seatX]);
                 }
+
             }
         }
 
@@ -242,17 +251,16 @@ app.get('/seats', (req, res) => {
         res.send(seats_by_time);
     });
 
-    for(var i = 0; i < 11; i++){
-        for(var j = 0; j < 14; j++){
+    for (var i = 0; i < 11; i++) {
+        for (var j = 0; j < 14; j++) {
             seats_by_time[i][j] = seats[i][j];
         }
     }
-    console.log("seat 전송해줬음");
 });
 
 // login
 // configuration =========================
-app.post('/loginCheck', (req, res) => {
+app.post('/users', (req, res) => {
     global.ID = req.body.inputID
     console.log("Requested ID = ", ID);
     connection.query("SELECT * from studentlist where ID =" + "'" + ID + "'", (error, rows) => {
@@ -261,12 +269,12 @@ app.post('/loginCheck', (req, res) => {
         if (rows.length == 0) {
             console.log("ID 불일치");
             res.redirect('/Page_Login.html')
-        } else if(rows[0].ID == 'admin') {
+        } else if (rows[0].ID == 'admin') {
             console.log("관리자 로그인");
             req.session.logined = true;
             res.redirect('/Page_Admin.html')
 
-        } else if(rows[0].ID == ID) {
+        } else if (rows[0].ID == ID) {
             console.log("ID 일치");
             console.log(rows[0].name);
             req.session.logined = true;
@@ -301,7 +309,7 @@ app.post('/register', (req, res) => {
     console.log("Registered dept = ", dept);
     console.log("Registered reason = ", reason);
 
-    connection.query("insert into register values(" + "'" + ID + "','" + name + "','" + dept + "','" + reason + "')" , (error, rows) => {
+    connection.query("insert into register values(" + "'" + ID + "','" + name + "','" + dept + "','" + reason + "')", (error, rows) => {
         if (error) throw error;
         res.redirect('/Page_Login.html')
     });
@@ -311,10 +319,10 @@ app.get('/registerList', (req, res, next) => {
     var sql = 'SELECT * FROM register';
 
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
-            for(var i = 0; i < rows.length; i++) {
+            for (var i = 0; i < rows.length; i++) {
                 console.log(rows[i]);
             }
             res.send(rows);
@@ -327,12 +335,12 @@ app.get('/registerApprove', (req, res, next) => {
     var sql = "DELETE FROM register WHERE ID=" + req.query.ID;
 
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
             sql = "INSERT INTO studentList values(" + "'" + req.query.ID + "','" + req.query.name + "','" + req.query.dept + "')";
             connection.query(sql, (error, rows) => {
-                if(error) {
+                if (error) {
                     console.log("ERROR");
                 } else {
                     console.log("사용자 추가 완료");
@@ -346,7 +354,7 @@ app.get('/registerApprove', (req, res, next) => {
 app.get('/registerReject', (req, res, next) => {
     var sql = "DELETE FROM register WHERE ID=" + req.query.ID;
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
             console.log("사용자 삭제 완료");
@@ -356,14 +364,24 @@ app.get('/registerReject', (req, res, next) => {
 });
 
 app.get('/reservationCancel', (req, res, next) => {
-    var sql = "DELETE FROM reservationList WHERE ID=" + req.query.ID + " AND " + "startTime ="  + req.query.startTime;
-    console.log(sql);
+    var sql = "DELETE FROM reservationList WHERE ID=" + req.query.ID + " AND " + "startTime =" + req.query.startTime;
     connection.query(sql, (error, rows) => {
-        if(error) {
+        if (error) {
             console.log("ERROR");
         } else {
             console.log("예약 취소 완료");
             res.redirect('/Page_Admin.html');
+        }
+    });
+});
+
+app.get('/getReservationListBySeatNum', function (req, res, next) {
+    var sql = 'SELECT * FROM reservationList WHERE seatNum = ' + req.query.seatNum;
+    connection.query(sql, (error, rows) => {
+        if (error) {
+            console.log("ERROR");
+        } else {
+            res.send(rows);
         }
     });
 });
