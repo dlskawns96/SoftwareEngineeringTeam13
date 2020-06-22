@@ -201,8 +201,6 @@ app.post("/rsv", (req, res) => {
     start = Number(start);
     use = Number(use);
     finish = start + use;
-    // res.send(String(start), String(use));
-    res.status().send(req.body);
 });
 
 

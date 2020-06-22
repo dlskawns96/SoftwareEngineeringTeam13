@@ -174,6 +174,19 @@
             });
     };
 
+    $.ajax({
+        url: 'http://localhost:8000/rsv',
+        async: true,
+        type: 'POST',
+        data: {
+            startTime: "9",
+            usingTime: "13"
+        },
+        dataType: 'json',
+        error: function(err){
+            alert("보내기 실패");
+        }
+    })
     //'http://localhost:8000/seats' 를 호출해서 웹서버에 현시점에서의 좌석예약현황 정보를 요청
     $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
 
@@ -192,7 +205,7 @@
                 if(seat == 1){ //좌석값이 '1'이면 'enable' 스타일을 적용하고 'click' 이벤트에 'onClickSeat()' 함수 적용
                     $output.addClass('enable').on('click', onClickSeat);
                 }else if(seat == 2){ //좌석값이 '2' 이면 'disable' 스타일을 적용
-                    $output.addClass('disable');
+                    $output.addClass('disable').on('click', onClickSeat);
                 }
             });
             $line.appendTo($('#seatingMap')); //완성된 라인을 <body> 태그에 붙인다.
