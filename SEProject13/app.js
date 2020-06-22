@@ -8,7 +8,7 @@ const dbconfig   = require('./config/database');
 const connection = mysql.createConnection(dbconfig);
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const serveStatic = require('serve-static');
+const serveStatic  = require('serve-static');
 const path = require('path');
 const cors = require('cors');
 
@@ -252,7 +252,7 @@ app.get('/seats', (req, res) => {
 
 // login
 // configuration =========================
-app.post('/users', (req, res) => {
+app.post('/loginCheck', (req, res) => {
     global.ID = req.body.inputID
     console.log("Requested ID = ", ID);
     connection.query("SELECT * from studentlist where ID =" + "'" + ID + "'", (error, rows) => {
