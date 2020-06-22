@@ -93,12 +93,12 @@
 
                         <table class="table" id="informationList">
                             <thead>
-                                <tr>
-                                    <th scope="col">ID</th>
-                                    <th scope="col">#seat</th>
-                                    <th scope="col">startTime</th>
-                                    <th scope="col">usage</th>
-                                </tr>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">#seat</th>
+                                <th scope="col">startTime</th>
+                                <th scope="col">usage</th>
+                            </tr>
                             </thead>
                             <tbody>
                             </tbody>
@@ -153,22 +153,19 @@
                         </div>
                         <script type="text/javascript">
                             var onClickSearch = function(){
-                                let startTime = $("#startTime option:selected").val();
-                                let usingTime = $("#usingTime option:selected").val();
+                                startTime = $("#startTime option:selected").val();
+                                usingTime = $("#usingTime option:selected").val();
 
                                 $.ajax({
                                     url: 'http://localhost:8000/rsv',
                                     async: true,
-                                    type: 'POST',
+                                    type: 'post',
                                     data: {
                                         startTime: startTime,
                                         usingTime: usingTime
                                     },
                                     dataType: 'json',
-                                    error: function(err){
-                                        alert("보내기 실패");
-                                    }
-                                })
+                                });
 
                                 $.getJSON('http://localhost:8000/seats', {dummy : new Date().getTime() },function(data){
 
@@ -225,6 +222,24 @@
 </script>
 <script type="text/javascript">
     //각 좌석을 click 할 때 실행될 함수 정의
+
+    var Now = new Date();
+    var nowTime = Now.getHours();
+
+    var startTime = nowTime;
+    var usingTime = "1";
+
+    $.ajax({
+        url: 'http://localhost:8000/rsv',
+        async: true,
+        type: 'post',
+        data: {
+            startTime: startTime,
+            usingTime: usingTime
+        },
+        dataType: 'json',
+    });
+
     var onClickSeat = function(){
 
         console.log("onClickSeat: ", new Date())
@@ -234,7 +249,7 @@
         var usingTime = $("#usingTime option:selected").val();
 
         if( confirm('예약하시겠습니까?') ){ //예약 확인용 confirm 화면 실행
-           //$(this).off('click'); //clik 이벤트 제거
+            //$(this).off('click'); //clik 이벤트 제거
             //소켓서버의 'app' 이벤트를 호출하면서  선택한 좌석죄표(x, y) 전송
             socket.emit('app', {
                 x : x,
@@ -272,8 +287,6 @@
         });
     });
 
-    var Now = new Date();
-    var nowTime = Now.getHours();
 
     if(nowTime < 22) {
         if (nowTime >= 9) {
@@ -332,7 +345,6 @@
                     "<td>" + seatNum  + "</td>" + "<td>" + f.startTime + "</td>" + "<td>" + f.finishTime + "</td>" +
                     "</tr>"
                 $(tblRow).appendTo("#informationList tbody");
-
             });
         });
     });

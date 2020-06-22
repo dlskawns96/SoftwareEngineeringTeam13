@@ -81,6 +81,14 @@ var use = 1;
 var finish = 10;
 let numOfRsv;
 
+/*
+var Now = new Date();
+var start = Now.getHours();
+var use = 1;
+var finish = start + 1;
+let numOfRsv;
+*/
+
 //Express 웹서버 생성
 var app = express();
 app.use(cors());
@@ -201,8 +209,6 @@ app.post("/rsv", (req, res) => {
     start = Number(start);
     use = Number(use);
     finish = start + use;
-    // res.send(String(start), String(use));
-    res.status().send(req.body);
 });
 
 
@@ -222,17 +228,17 @@ app.get('/seats', (req, res) => {
                 var startTime = rows[i].startTime;
                 var usingTime = rows[i].finishTime;
                 var finishTime = startTime + usingTime;
-                console.log(seatNum + " " + seatY + " " + seatX + " " + startTime + " " + finishTime);
+                // console.log(seatNum + " " + seatY + " " + seatX + " " + startTime + " " + finishTime);
 
                 if ((startTime < start && finishTime > start) || (startTime >= start && finishTime <= finish)
                     || (startTime < finish && finishTime > finish)){
                     seats_by_time[seatY][seatX] = 2;
-                    console.log(seats_by_time[seatY][seatX]);
+                    // console.log(seats_by_time[seatY][seatX]);
                 }
             }
         }
 
-        console.log(seats_by_time);
+        // console.log(seats_by_time);
         res.send(seats_by_time);
     });
 
