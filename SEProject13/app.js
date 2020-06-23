@@ -260,7 +260,7 @@ app.get('/seats', (req, res) => {
 
 // login
 // configuration =========================
-app.post('/users', (req, res) => {
+app.post('/loginCheck', (req, res) => {
     global.ID = req.body.inputID
     console.log("Requested ID = ", ID);
     connection.query("SELECT * from studentlist where ID =" + "'" + ID + "'", (error, rows) => {
@@ -331,7 +331,7 @@ app.get('/registerList', (req, res, next) => {
 });
 
 app.get('/registerApprove', (req, res, next) => {
-    console.log(req.query.ID);
+    console.log("ID : ", req.query.ID);
     var sql = "DELETE FROM register WHERE ID=" + req.query.ID;
 
     connection.query(sql, (error, rows) => {
